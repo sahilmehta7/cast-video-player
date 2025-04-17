@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cast-Enabled Video Player</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+    }
+    #video-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      background: black;
+    }
+    #cast-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <div id="video-container">
+    <cast-button id="cast-button" style="width: 48px; height: 48px;"></cast-button>
+    <video id="video" controls autoplay></video>
+  </div>
+
+  <script>
+    // Load Shaka Player
+    shaka.polyfill.installAll();
+
+    const video = document.getElementById('video');
+    const player = new shaka.Player(video);
+
+    // Parse query param
+    function getVideoUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('url');
+    }
+
+    async function loadVideo() {
+      const url = getVideoUrl();
+      if (!url) {
+        alert("Missing video URL in query string. Use ?url=...");
+        return;
+      }
+      try {
+        await player.load(url);
+      } catch (e) {
+        console.error("Error loading video", e);
+        alert("Failed to load video.");
+      }
+    }
+
+    loadVideo();
+
+    // Cast Button Setup
+    window['__onGCastApiAvailable'] = function(isAvailable) {
+      if (isAvailable) {
+        cast.framework.CastContext.getInstance().setOptions({
+          receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+          autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+        });
+      }
+    };
+  </script>
+</body>
+</html>
