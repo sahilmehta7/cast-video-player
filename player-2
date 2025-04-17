@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JW Player with YouTube</title>
+  <script src="https://cdn.jwplayer.com/libraries/YOUR_PLAYER_KEY.js"></script>
+  <style>
+    body { margin: 0; background: #000; }
+    #player { width: 100%; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="player"></div>
+
+  <script>
+    // Get the YouTube URL from query params
+    const urlParams = new URLSearchParams(window.location.search);
+    const youtubeURL = urlParams.get('url');
+
+    if (!youtubeURL || !youtubeURL.includes('youtube.com')) {
+      document.body.innerHTML = '<h2 style="color:white;text-align:center;">Invalid or missing YouTube URL.</h2>';
+    } else {
+      jwplayer("player").setup({
+        file: youtubeURL,
+        width: "100%",
+        aspectratio: "16:9"
+      });
+    }
+  </script>
+</body>
+</html>
